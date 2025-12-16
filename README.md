@@ -1,340 +1,198 @@
-# JEE Timetable - Monorepo
+# JEE Timetable - Electron Desktop Application
 
-A comprehensive study planner for JEE preparation with Electron desktop app, React web client, and TypeScript SDK.
+A modern desktop application for managing your JEE study timetable, built with Electron and React.
+
+## Features
+
+- 🔐 **Secure Authentication**: Uses keytar for encrypted credential storage
+- 💾 **Offline-First**: Works without network after initial sync with filesystem-backed cache
+- 🔄 **Auto-Updates**: Automatic update notifications and installation
+- 🔗 **Deep Linking**: Support for `timetable://` protocol
+- 🎨 **Theme Toggle**: Light/Dark mode support
+- 🔊 **Sound Effects**: Optional audio feedback for task completion
+- 📊 **Multiple Views**: Timeline and Grid layout options
+- 📈 **Progress Tracking**: Real-time tracking of completed tasks
+- 💪 **Bengali Quotes**: Motivational and roast quotes on card flip
+- 🌐 **Cross-Platform**: Works on Windows, macOS, and Linux
 
 ## Project Structure
 
 ```
-.
+jee-timetable/
+├── main.js                 # Electron main process (desktop shell)
+├── preload.js             # Hardened preload script with secure SDK
+├── data.js                # Legacy data (fallback for offline mode)
 ├── apps/
-│   └── web/              # React + Vite + TypeScript web client
+│   └── web/               # React web application
+│       ├── src/
+│       │   ├── main.jsx           # React entry point
+│       │   ├── App.jsx            # Main app component
+│       │   ├── App.css            # Styles
+│       │   ├── components/
+│       │   │   ├── AuthScreen.jsx      # Authentication UI
+│       │   │   └── TimetableApp.jsx    # Main timetable component
+│       │   ├── data/
+│       │   │   ├── quotes.js     # Bengali quotes
+│       │   │   └── timetable.js  # Default schedule data
+│       │   └── utils/
+│       │       └── time-utils.js # Time parsing utilities
+│       ├── public/        # Static assets (sounds, icons)
+│       └── package.json   # React app dependencies
 ├── packages/
-│   └── timetable-sdk/    # TypeScript SDK for API integration
-├── main.js               # Electron main process
-├── renderer.js           # Electron renderer
-├── preload.js            # Electron preload script
-├── index.html            # Electron HTML
-├── style.css             # Shared CSS
-├── data.js               # Schedule data
-└── src/
-    └── time-utils.js     # Time parsing utilities
+│   └── sdk/               # Shared SDK for Electron ↔ Web communication
+│       └── src/
+│           ├── index.js   # SDK interface
+│           └── adapter.js # Electron & Web adapters
+└── package.json           # Root Electron dependencies
 ```
 
-## Applications
+## Development Setup
 
-### 🖥️ Electron Desktop App
+### Prerequisites
 
-The original desktop application with a native interface.
-
-**Run:**
-```bash
-npm start
-```
-
-**Features:**
-- Native desktop experience
-- Offline-first design
-- System tray integration
-- Bengali motivation/roast cards
-- Live task tracking
-
-### 🌐 Web Client (NEW)
-
-Modern React SPA with real-time sync and PWA support.
-
-**Run:**
-```bash
-npm run dev --workspace apps/web
-```
-
-**Features:**
-- ✅ Authentication (login/register)
-- ✅ Responsive dashboard with timeline/grid views
-- ✅ Real-time updates via Socket.IO
-- ✅ Offline support with Service Worker + IndexedDB
-- ✅ Bengali flip cards
-- ✅ Theme toggle (light/dark)
-- ✅ Sound effects toggle
-- ✅ Progress tracking and stats
-- ✅ PWA installable
-- ✅ Mobile-friendly
-
-**Build:**
-```bash
-npm run build --workspace apps/web
-```
-
-**Preview:**
-```bash
-npm run preview --workspace apps/web
-```
-
-See [apps/web/README.md](apps/web/README.md) for detailed documentation.
-
-## Packages
-
-### 📦 Timetable SDK
-
-TypeScript SDK for backend API integration.
-
-**Build:**
-```bash
-npm run build --workspace packages/timetable-sdk
-```
-
-**Features:**
-- Authentication service
-- Schedule CRUD operations
-- Socket.IO real-time updates
-- Full TypeScript support
-- React integration helpers
-
-See [packages/timetable-sdk/README.md](packages/timetable-sdk/README.md) for API documentation.
-
-## Quick Start
+- Node.js 16+ and npm
+- Python (for keytar native module compilation)
 
 ### Installation
 
 ```bash
+# Install root dependencies (Electron + desktop modules)
 npm install
+
+# Install React app dependencies
+cd apps/web
+npm install
+cd ../..
 ```
 
-This will install dependencies for all workspaces.
+### Running in Development Mode
 
-### Development
-
-**Desktop App:**
+#### Option 1: Run built React app in Electron
 ```bash
+# Build the React app first
+npm run build
+
+# Start Electron with the built app
 npm start
 ```
 
-**Web App:**
+#### Option 2: Run with hot-reload (development mode)
 ```bash
+# Terminal 1: Start Vite dev server
+npm run dev:web
+
+# Terminal 2: Start Electron pointing to dev server
+npm run dev:electron
+
+# Or use concurrently to run both
 npm run dev
 ```
 
-The web app will run at `http://localhost:5173` with:
-- Mock data (no backend required)
-- Hot module replacement
-- TypeScript checking
-- Auto-reload on changes
-
-### Backend Setup (Optional)
-
-For full functionality with real-time sync:
-
-1. Start your backend API server on `http://localhost:3000`
-2. Ensure it implements the endpoints documented in the SDK
-3. Set `VITE_API_URL` to disable mock mode:
+### Building for Production
 
 ```bash
-VITE_API_URL=http://localhost:3000 npm run dev --workspace apps/web
+# Build React app and package Electron
+npm run build:electron
 ```
 
-## Features
-
-### Shared Features (All Apps)
-
-- 📅 **Weekly Schedule**: 7-day timetable with subject breakdown
-- ⏰ **Live Tracking**: Real-time task highlighting
-- 📊 **Progress Stats**: Completion tracking and analytics
-- 🎨 **Theme Support**: Light/dark mode
-- 🔊 **Sound Effects**: Audio feedback
-- 🇧🇩 **Bengali Cards**: Motivational and roast quotes
-- 📱 **Responsive**: Works on all screen sizes
-
-### Web-Specific Features
-
-- 🔐 **Authentication**: Secure login/register
-- 🔄 **Real-time Sync**: Socket.IO live updates
-- 📴 **Offline Mode**: Full offline functionality
-- 🚀 **PWA**: Install as native app
-- ♿ **Accessible**: WCAG compliant
+The packaged application will be in the `dist/` directory.
 
 ## Architecture
 
-### Tech Stack
+### Electron Main Process (`main.js`)
 
-**Electron App:**
-- Electron 29
-- Vanilla JavaScript
-- HTML/CSS
+- Creates the BrowserWindow
+- Loads the React app (dev server in development, built files in production)
+- Handles IPC communication via channels: `auth`, `schedule`, `cache`, `preferences`, `system`
+- Manages secure credential storage with keytar
+- Implements filesystem-backed offline cache
+- Sets up deep-link handling (`timetable://`)
+- Configures auto-updater
 
-**Web Client:**
-- React 18
-- TypeScript 5
-- Vite 5
-- Socket.IO Client
-- IndexedDB (idb)
-- Vite PWA Plugin
+### Preload Script (`preload.js`)
 
-**SDK:**
-- TypeScript 5
-- Socket.IO Client
-- ESM modules
+Hardened bridge between main and renderer processes:
+- Only exposes whitelisted IPC channels
+- Uses `contextIsolation` for security
+- Provides safe SDK interface via `window.electronAPI`
 
-### Data Flow
+### SDK Layer (`packages/sdk`)
 
-1. **Authentication**:
-   - User logs in via web client
-   - SDK stores token in localStorage
-   - Token used for API requests and Socket.IO auth
+Abstraction layer for platform-specific functionality:
+- **TimetableSDK**: High-level API for authentication, schedule, cache, preferences
+- **ElectronAdapter**: Electron-specific implementation
+- **WebAdapter**: Browser fallback (uses localStorage, fetch API)
 
-2. **Schedule Loading**:
-   - Fetch from API or mock data
-   - Cache in IndexedDB
-   - Display in UI
+### React App (`apps/web`)
 
-3. **Real-time Updates**:
-   - Socket.IO connection on auth
-   - Listen for `schedule:updated` events
-   - Update state and cache automatically
+Modern React application with:
+- **AuthScreen**: Login interface
+- **TimetableApp**: Main schedule view with day selector, progress tracking, card flips
+- Theme and sound preferences
+- Offline/online status indicator
+- Real-time schedule updates
 
-4. **Offline Mode**:
-   - Service Worker caches assets
-   - IndexedDB persists data
-   - App works without network
+## Security Features
 
-## Time Utilities
+1. **Context Isolation**: Renderer process isolated from Node.js APIs
+2. **Sandbox**: Renderer runs in Chromium sandbox
+3. **No Remote Module**: Remote module disabled
+4. **Whitelisted IPC**: Only approved channels allowed
+5. **Keytar Integration**: OS-level credential encryption (Keychain on macOS, Credential Vault on Windows, libsecret on Linux)
 
-Both desktop and web apps share time parsing logic:
+## Offline Support
 
-```javascript
-import { parseTimeRange, isTaskLive } from './utils/time-utils';
+The app caches schedule data in the user's app data directory:
+- **Windows**: `%APPDATA%/jee-timetable/cache/`
+- **macOS**: `~/Library/Application Support/jee-timetable/cache/`
+- **Linux**: `~/.config/jee-timetable/cache/`
 
-const [start, end] = parseTimeRange('9:00 – 11:00 AM', new Date());
-const isLive = isTaskLive('9:00 – 11:00 AM', new Date());
+When offline, the app automatically uses cached data and displays an offline indicator.
+
+## Deep Links
+
+The app registers the `timetable://` protocol:
+```
+timetable://open/schedule
+timetable://open/preferences
 ```
 
-**Functions:**
-- `parseTimeString(timeStr, baseDate)` - Parse single time
-- `parseTimeRange(timeStr, baseDate)` - Parse time range
-- `isTaskLive(timeStr, now)` - Check if task is active
-- `isTaskCompleted(timeStr, now)` - Check if task is done
-- `getTaskProgress(timeStr, now)` - Get completion percentage
+## Auto-Updates
 
-## Deployment
-
-### Web Client
-
-**GitHub Pages:**
-```bash
-npm run build --workspace apps/web
-# Deploy apps/web/dist/ to gh-pages branch
-```
-
-**Cloudflare Pages:**
-- Build command: `npm run build --workspace apps/web`
-- Output directory: `apps/web/dist`
-
-**Docker:**
-```bash
-docker build -t timetable-web -f apps/web/Dockerfile .
-docker run -p 5173:5173 timetable-web
-```
-
-### Electron Desktop
-
-**Package for distribution:**
-```bash
-npm run package
-```
-
-Requires electron-packager configuration in package.json.
-
-## Development Guidelines
-
-### Code Style
-
-- Use TypeScript for web client and SDK
-- Follow existing patterns in codebase
-- Add ARIA labels for accessibility
-- Use CSS custom properties for theming
-- Keep components small and focused
-
-### Time Parsing
-
-- Time parsing functions are in `src/time-utils.js`
-- Exported as CommonJS (for tests) and window globals (for browser)
-- Web client uses TypeScript version in `apps/web/src/utils/time-utils.ts`
-
-### CSS Management
-
-- Shared CSS in `style.css`
-- Web-specific CSS in `apps/web/src/styles/app.css`
-- Use CSS custom properties for colors/spacing
-- Follow mobile-first responsive design
-
-### Rendering Optimization
-
-- Track `lastRenderedDay` and `lastLiveTask`
-- Use DocumentFragment for batch DOM updates
-- Debounce expensive operations
-- Reset state when switching days
+In production builds, the app checks for updates:
+- On startup
+- Every hour
+- Notifies user when update is available
+- Downloads and installs in background
 
 ## Testing
 
-**Time parsing tests:**
 ```bash
+# Run unit tests for time parsing
 npm test
 ```
 
-**Web client:**
-```bash
-cd apps/web
-npm run dev  # Manual testing in browser
-```
+## Legacy Files
 
-## Scripts
-
-**Root level:**
-- `npm start` - Run Electron app
-- `npm test` - Run time parsing tests
-- `npm run dev` - Run web client dev server
-- `npm run build` - Build web client
-
-**Web client:**
-- `npm run dev` - Start dev server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-
-**SDK:**
-- `npm run build` - Build SDK
-- `npm run dev` - Watch mode
+The following files are kept for backward compatibility and will be retired in future versions:
+- `index.html` - Old static HTML (replaced by React app)
+- `renderer.js` - Old vanilla JS renderer (replaced by React components)
+- `style.css` - Old styles (migrated to React app)
 
 ## Environment Variables
 
-**Web Client:**
-
-- `VITE_API_URL` - Backend API URL (optional, uses mock if not set)
-
-## Browser Support
-
-- Chrome/Edge 90+
-- Firefox 88+
-- Safari 14+
-- Mobile browsers
-
-## Known Issues
-
-- Mock mode doesn't persist changes (by design)
-- Socket.IO requires WebSocket support
-- PWA requires HTTPS in production
+- `NODE_ENV`: Set to `development` to load dev server
+- `VITE_DEV_SERVER_URL`: Custom dev server URL (default: `http://localhost:3000`)
 
 ## Contributing
 
-1. Create feature branch
-2. Make changes following guidelines
-3. Test thoroughly
-4. Submit pull request
+When making changes:
+1. Follow existing code patterns
+2. Test both development and production builds
+3. Ensure offline mode works
+4. Verify deep links on target platform
+5. Test auto-update flow
 
 ## License
 
-MIT
-
-## Support
-
-For issues or questions:
-- Check README files in subdirectories
-- Review SDK documentation
-- Check browser console for errors
+Proprietary - All rights reserved

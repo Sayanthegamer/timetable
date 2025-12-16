@@ -1,16 +1,41 @@
-
 const { contextBridge, ipcRenderer } = require('electron');
-const path = require('path');
-const { timetable } = require(path.join(__dirname, 'data.js'));
+
+const ALLOWED_CHANNELS = [
+  'auth',
+  'schedule',
+  'cache',
+  'preferences',
+  'system'
+];
+
+const ALLOWED_EVENTS = [
+  'schedule-updated',
+  'auth-state-changed',
+  'deep-link',
+  'update-available',
+  'update-downloaded'
+];
 
 contextBridge.exposeInMainWorld('electronAPI', {
-    ipcRenderer: ipcRenderer,
-    timetable: timetable,
-});
+  invoke: (channel, method, args) => {
+    if (ALLOWED_CHANNELS.includes(channel)) {
+      return ipcRenderer.invoke(channel, method, args);
+    }
+    throw new Error(`Channel ${channel} is not allowed`);
+  },
 
-// You can also expose specific functions from ipcRenderer if needed,
-// for example, if you only want to allow specific channels:
-// contextBridge.exposeInMainWorld('electronAPI', {
-//   send: (channel, data) => ipcRenderer.send(channel, data),
-//   receive: (channel, func) => ipcRenderer.on(channel, (event, ...args) => func(...args))
-// });
+  on: (event, callback) => {
+    if (ALLOWED_EVENTS.includes(event)) {
+      const subscription = (_, data) => callback(data);
+      ipcRenderer.on(event, subscription);
+      return () => ipcRenderer.removeListener(event, subscription);
+    }
+    throw new Error(`Event ${event} is not allowed`);
+  },
+
+  off: (event, callback) => {
+    if (ALLOWED_EVENTS.includes(event)) {
+      ipcRenderer.removeListener(event, callback);
+    }
+  }
+});
