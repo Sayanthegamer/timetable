@@ -33,3 +33,16 @@ yarn-error.log*
 # Environment variables
 .env
 .env.local
+.env.*.local
+
+# Database
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# API build output
+services/api/dist/
+
+# Prisma
+services/api/prisma/migrations/*_migration.sql

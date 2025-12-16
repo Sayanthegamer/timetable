@@ -1,10 +1,18 @@
 {
   "name": "jee-timetable",
   "version": "1.0.0",
-  "main": "main.js",
+  "private": true,
+  "workspaces": [
+    "services/api"
+  ],
   "scripts": {
     "start": "electron .",
-    "test": "node test_parseTimeRange.js"
+    "test": "node test_parseTimeRange.js",
+    "api:dev": "npm run dev --workspace=services/api",
+    "api:build": "npm run build --workspace=services/api",
+    "api:start": "npm run start --workspace=services/api",
+    "api:test": "npm run test --workspace=services/api",
+    "api:migrate": "npm run migrate --workspace=services/api"
   },
   "devDependencies": {
     "electron": "^29.3.0",
