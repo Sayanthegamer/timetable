@@ -5,8 +5,6 @@ import { validate } from '../middleware/validation';
 import { registerSchema, loginSchema, refreshTokenSchema } from '../schemas/auth';
 import { authenticate, AuthRequest } from '../middleware/auth';
 
-const router = Router();
-router.post('/register', validate(registerSchema), register);
 router.post('/login', validate(loginSchema), login);
 router.post('/refresh', refreshLimiter, validate(refreshTokenSchema), refreshToken);
 router.post('/logout', authenticate, logout);
