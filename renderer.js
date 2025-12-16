@@ -73,11 +73,9 @@ function switchDay(day) {
   renderSchedule(day, isManual);
 
   document.querySelectorAll('.day-selector button').forEach(btn => {
-    btn.classList.remove('active');
-    const dayNameSpan = btn.querySelector('.day-name');
-    if (dayNameSpan && dayNameSpan.textContent.trim() === day) {
-      btn.classList.add('active');
-    }
+    const isActive = btn.dataset.day === day;
+    btn.classList.toggle('active', isActive);
+    btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
   });
 }
 
@@ -363,17 +361,18 @@ function initThemeToggle() {
 function initDaySelector() {
   const buttons = document.querySelectorAll('.day-selector button');
   buttons.forEach(btn => {
-    const dayNameSpan = btn.querySelector('.day-name');
-    if (dayNameSpan && dayNameSpan.textContent.trim() === currentDay) {
+    const day = btn.dataset.day;
+    if (day === currentDay) {
       btn.classList.add('active');
+      btn.setAttribute('aria-pressed', 'true');
     }
     btn.addEventListener('click', function () {
       if (userHasInteracted) {
         soundManager.play('click');
       }
-      const dayNameSpan = this.querySelector('.day-name');
-      if (dayNameSpan) {
-        switchDay(dayNameSpan.textContent.trim());
+      const day = this.dataset.day;
+      if (day) {
+        switchDay(day);
       }
     });
     // Add hover sound
@@ -426,15 +425,7 @@ document.addEventListener('DOMContentLoaded', function () {
     return;
   }
 
-  // Create an ARIA live region for announcements (screen-reader only)
-  if (!document.getElementById('sr-announce')) {
-    const sr = document.createElement('div');
-    sr.id = 'sr-announce';
-    sr.className = 'sr-only';
-    sr.setAttribute('aria-live', 'polite');
-    sr.setAttribute('aria-atomic', 'true');
-    document.body.appendChild(sr);
-  }
+  // ARIA live region for announcements is defined in HTML
 
   // Check if timetable exists
   if (!window.timetable) {
@@ -533,10 +524,11 @@ class SoundManager {
   }
 
   init() {
-    // Set volume for all sounds
+    // Set volume for all sounds and ensure they start muted
     Object.values(this.sounds).forEach(sound => {
       if (sound) {
         sound.volume = this.volume;
+        sound.muted = true;
       }
     });
   }
@@ -555,8 +547,10 @@ class SoundManager {
       return;
     }
     try {
-      this.sounds[soundName].currentTime = 0;
-      const playPromise = this.sounds[soundName].play();
+      const sound = this.sounds[soundName];
+      sound.muted = false;
+      sound.currentTime = 0;
+      const playPromise = sound.play();
       if (playPromise && playPromise.catch) {
         playPromise.catch(e => {
           console.log('[SoundManager] Sound autoplay prevented:', e);
@@ -571,6 +565,12 @@ class SoundManager {
 
   toggle() {
     this.enabled = !this.enabled;
+    // When disabled, mute all sounds
+    if (!this.enabled) {
+      Object.values(this.sounds).forEach(sound => {
+        if (sound) sound.muted = true;
+      });
+    }
     return this.enabled;
   }
 
