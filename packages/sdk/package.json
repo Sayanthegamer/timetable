@@ -1,0 +1,10 @@
+{
+  "name": "@timetable/sdk",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "description": "SDK for timetable app - shared interface between Electron and web",
+  "exports": {
+    ".": "./src/index.js",
+    "./adapter": "./src/adapter.js"
+  }
+}

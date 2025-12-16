@@ -1,29 +1,49 @@
-export interface TimetableEntry {
+export interface Task {
   time: string;
   subject: string;
   details: string;
-  type: string;
+  type: 'maths' | 'physics' | 'chemistry' | 'english' | 'computer' | 'bengali' | 'break';
 }
 
-export interface Timetable {
-  [day: string]: TimetableEntry[];
+export interface Schedule {
+  Sunday: Task[];
+  Monday: Task[];
+  Tuesday: Task[];
+  Wednesday: Task[];
+  Thursday: Task[];
+  Friday: Task[];
+  Saturday: Task[];
 }
 
-export type DayOfWeek = 'Sunday' | 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday';
-
-export interface StorageAdapter {
-  getItem(key: string): Promise<string | null>;
-  setItem(key: string, value: string): Promise<void>;
-  removeItem(key: string): Promise<void>;
+export interface User {
+  id: string;
+  email: string;
+  name: string;
 }
 
-export interface AuthConfig {
-  apiUrl: string;
-  storage: StorageAdapter;
+export interface AuthResponse {
+  user: User;
+  token: string;
 }
 
-export interface SyncConfig {
-  apiUrl: string;
-  storage: StorageAdapter;
-  autoSync?: boolean;
+export interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+export interface RegisterCredentials {
+  email: string;
+  password: string;
+  name: string;
+}
+
+export interface TaskUpdate {
+  day: keyof Schedule;
+  taskIndex: number;
+  task: Task;
+}
+
+export interface ScheduleUpdate {
+  day: keyof Schedule;
+  tasks: Task[];
 }
