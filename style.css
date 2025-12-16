@@ -265,7 +265,6 @@ input:checked + .slider:after {
   color: var(--info);
 }
 
-/* File renamed to style.css. This file is now obsolete. */
 .progress-ring {
   position: relative;
   width: 110px;
@@ -772,7 +771,7 @@ body.dark .stat-icon {
 }
 
 /* Schedule Container */
-.schedule-timeline, .schedule-grid {
+.schedule-container {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
