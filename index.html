@@ -18,10 +18,13 @@
 </head>
 
 <body>
-  <div style="position: fixed; top: 0; left: 0; background: red; color: white; padding: 10px; z-index: 9999;">
-    CSS Test - If you see this in red, HTML works but CSS might not be loading
-  </div>
-  <div class="sidebar">
+  <noscript>
+    <div style="padding: 2rem; background: #fee; border: 2px solid #c33; text-align: center;">
+      <strong>JavaScript Required:</strong> This application requires JavaScript to function properly.
+    </div>
+  </noscript>
+  <div id="sr-announce" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+  <aside class="sidebar">
     <div class="sidebar-header">
       <div class="logo-section">
         <div class="logo-icon">🎯</div>
@@ -32,37 +35,37 @@
       </div>
     </div>
     <div class="day-selector">
-      <button type="button">
+      <button type="button" data-day="Monday" aria-pressed="false">
         <span class="day-icon">🌅</span>
         <span class="day-name">Monday</span>
         <span class="day-arrow">→</span>
       </button>
-      <button type="button">
+      <button type="button" data-day="Tuesday" aria-pressed="false">
         <span class="day-icon">⚡</span>
         <span class="day-name">Tuesday</span>
         <span class="day-arrow">→</span>
       </button>
-      <button type="button">
+      <button type="button" data-day="Wednesday" aria-pressed="false">
         <span class="day-icon">🔥</span>
         <span class="day-name">Wednesday</span>
         <span class="day-arrow">→</span>
       </button>
-      <button type="button">
+      <button type="button" data-day="Thursday" aria-pressed="false">
         <span class="day-icon">💫</span>
         <span class="day-name">Thursday</span>
         <span class="day-arrow">→</span>
       </button>
-      <button type="button">
+      <button type="button" data-day="Friday" aria-pressed="false">
         <span class="day-icon">🌟</span>
         <span class="day-name">Friday</span>
         <span class="day-arrow">→</span>
       </button>
-      <button type="button">
+      <button type="button" data-day="Saturday" aria-pressed="false">
         <span class="day-icon">🚀</span>
         <span class="day-name">Saturday</span>
         <span class="day-arrow">→</span>
       </button>
-      <button type="button">
+      <button type="button" data-day="Sunday" aria-pressed="false">
         <span class="day-icon">✨</span>
         <span class="day-name">Sunday</span>
         <span class="day-arrow">→</span>
@@ -93,10 +96,9 @@
         <div class="credits-helper">with help of <span class="credits-claude">Claude</span></div>
       </div>
     </div>
-  </div>
-  </div>
+  </aside>
 
-  <div class="main-content">
+  <main class="main-content">
     <header class="main-header">
       <div class="header-left">
         <h1 class="main-title">
@@ -169,30 +171,27 @@
           <button class="view-btn" data-view="grid">Grid</button>
         </div>
       </div>
-      <div id="schedule-container" class="schedule-timeline">Loading schedule...</div>
+      <div id="schedule-container" class="schedule-container schedule-timeline" role="region" aria-label="Schedule">Loading schedule...</div>
     </div>
-  </div>
+  </main>
 
-  </div>
+  <!-- Sound Effects -->
+  <audio id="click-sound" preload="metadata" aria-hidden="true" muted>
+    <source src="sounds/click.wav" type="audio/wav">
+  </audio>
+  <audio id="hover-sound" preload="metadata" aria-hidden="true" muted>
+    <source src="sounds/hover.wav" type="audio/wav">
+  </audio>
+  <audio id="complete-sound" preload="metadata" aria-hidden="true" muted>
+    <source src="sounds/complete.wav" type="audio/wav">
+  </audio>
+  <audio id="notification-sound" preload="metadata" aria-hidden="true" muted>
+    <source src="sounds/notification.wav" type="audio/wav">
+  </audio>
+  <audio id="theme-sound" preload="metadata" aria-hidden="true" muted>
+    <source src="sounds/theme.wav" type="audio/wav">
+  </audio>
 
-  <!-- Sound Effects (temporarily disabled) -->
-  <!--
-<audio id="click-sound" preload="auto">
-  <source src="sounds/click.wav" type="audio/wav">
-</audio>
-<audio id="hover-sound" preload="auto">
-  <source src="sounds/hover.wav" type="audio/wav">
-</audio>
-<audio id="complete-sound" preload="auto">
-  <source src="sounds/complete.wav" type="audio/wav">
-</audio>
-<audio id="notification-sound" preload="auto">
-  <source src="sounds/notification.wav" type="audio/wav">
-</audio>
-<audio id="theme-sound" preload="auto">
-  <source src="sounds/theme.wav" type="audio/wav">
-</audio>
--->
   <script src="data.js"></script>
   <script src="src/time-utils.js"></script>
   <script>
