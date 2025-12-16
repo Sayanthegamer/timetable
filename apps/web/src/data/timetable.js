@@ -1,6 +1,4 @@
-// Export the timetable data properly for use in renderer
-// NOTE: Domain models are now in @jee-timetable/timetable-sdk
-const timetable = {
+export const defaultTimetable = {
   Sunday: [
     { time: "6:30 – 9:00 AM", subject: "📐 Maths Tuition", details: "", type: "maths" },
     { time: "9:15 – 9:30 AM", subject: "🍽️ Breakfast + Light Phone Check", details: "", type: "break" },
@@ -93,14 +91,3 @@ const timetable = {
     { time: "10:10 – 11:00 PM", subject: "📱 Wind Down / Light Phone Use", details: "", type: "break" }
   ]
 };
-
-
-// Make it available globally for the renderer (browser)
-if (typeof window !== 'undefined') {
-  window.timetable = timetable;
-}
-
-// Support both browser and Node.js (preload) usage
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { timetable };
-}

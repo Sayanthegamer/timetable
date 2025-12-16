@@ -1,0 +1,17 @@
+{
+  "name": "JEE Timetable",
+  "short_name": "Timetable",
+  "description": "Interactive study planner with live updates and offline support",
+  "theme_color": "#6366f1",
+  "background_color": "#f8fafc",
+  "display": "standalone",
+  "scope": "/",
+  "start_url": "/",
+  "icons": [
+    {
+      "src": "/icon.ico",
+      "sizes": "64x64",
+      "type": "image/x-icon"
+    }
+  ]
+}

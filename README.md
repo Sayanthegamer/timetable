@@ -1,272 +1,198 @@
-# JEE Timetable
+# JEE Timetable - Electron Desktop Application
 
-A comprehensive study schedule management system for JEE (Joint Entrance Examination) preparation, featuring an Electron desktop app and a cloud-ready REST API with real-time synchronization.
+A modern desktop application for managing your JEE study timetable, built with Electron and React.
 
-## 📦 Project Structure
+## Features
 
-This is an npm workspace monorepo containing:
+- 🔐 **Secure Authentication**: Uses keytar for encrypted credential storage
+- 💾 **Offline-First**: Works without network after initial sync with filesystem-backed cache
+- 🔄 **Auto-Updates**: Automatic update notifications and installation
+- 🔗 **Deep Linking**: Support for `timetable://` protocol
+- 🎨 **Theme Toggle**: Light/Dark mode support
+- 🔊 **Sound Effects**: Optional audio feedback for task completion
+- 📊 **Multiple Views**: Timeline and Grid layout options
+- 📈 **Progress Tracking**: Real-time tracking of completed tasks
+- 💪 **Bengali Quotes**: Motivational and roast quotes on card flip
+- 🌐 **Cross-Platform**: Works on Windows, macOS, and Linux
+
+## Project Structure
 
 ```
 jee-timetable/
-├── services/
-│   └── api/                    # Backend API (Node.js + TypeScript + PostgreSQL)
-│       ├── src/                # Source code
-│       ├── prisma/             # Database schema & migrations
-│       ├── tests/              # API tests
-│       └── README.md           # API documentation
-├── src/                        # Desktop app utilities
-│   └── time-utils.js          # Time parsing functions
-├── sounds/                     # Audio assets
-├── data.js                     # Timetable data structure
-├── index.html                  # Main app UI
-├── renderer.js                 # Frontend logic
-├── style.css                   # Styles
-├── main.js                     # Electron main process
-├── preload.js                  # Electron preload script
-└── package.json                # Workspace root
+├── main.js                 # Electron main process (desktop shell)
+├── preload.js             # Hardened preload script with secure SDK
+├── data.js                # Legacy data (fallback for offline mode)
+├── apps/
+│   └── web/               # React web application
+│       ├── src/
+│       │   ├── main.jsx           # React entry point
+│       │   ├── App.jsx            # Main app component
+│       │   ├── App.css            # Styles
+│       │   ├── components/
+│       │   │   ├── AuthScreen.jsx      # Authentication UI
+│       │   │   └── TimetableApp.jsx    # Main timetable component
+│       │   ├── data/
+│       │   │   ├── quotes.js     # Bengali quotes
+│       │   │   └── timetable.js  # Default schedule data
+│       │   └── utils/
+│       │       └── time-utils.js # Time parsing utilities
+│       ├── public/        # Static assets (sounds, icons)
+│       └── package.json   # React app dependencies
+├── packages/
+│   └── sdk/               # Shared SDK for Electron ↔ Web communication
+│       └── src/
+│           ├── index.js   # SDK interface
+│           └── adapter.js # Electron & Web adapters
+└── package.json           # Root Electron dependencies
 ```
 
-## 🚀 Quick Start
+## Development Setup
 
-### Desktop App Only
+### Prerequisites
+
+- Node.js 16+ and npm
+- Python (for keytar native module compilation)
+
+### Installation
 
 ```bash
+# Install root dependencies (Electron + desktop modules)
 npm install
+
+# Install React app dependencies
+cd apps/web
+npm install
+cd ../..
+```
+
+### Running in Development Mode
+
+#### Option 1: Run built React app in Electron
+```bash
+# Build the React app first
+npm run build
+
+# Start Electron with the built app
 npm start
 ```
 
-The Electron app launches with the JEE study schedule interface.
-
-### Backend API Setup
-
-See [services/api/QUICK_START.md](services/api/QUICK_START.md) for detailed setup.
-
-**Quick version:**
-
+#### Option 2: Run with hot-reload (development mode)
 ```bash
-# 1. Start PostgreSQL
-cd services/api
-docker-compose up -d
+# Terminal 1: Start Vite dev server
+npm run dev:web
 
-# 2. Install & migrate
-npm install
-npm run migrate
-npm run seed
+# Terminal 2: Start Electron pointing to dev server
+npm run dev:electron
 
-# 3. Start API server
+# Or use concurrently to run both
 npm run dev
 ```
 
-API runs on http://localhost:3001
-
-## 🎯 Features
-
-### Desktop App
-- 📅 **Weekly Schedule View** - Visualize your entire week
-- 🎨 **Beautiful UI** - Glassmorphic design with dark/light themes
-- 🔔 **Live Updates** - Real-time highlighting of current tasks
-- 📊 **Progress Tracking** - Daily completion statistics
-- 🎵 **Sound Effects** - Audio notifications for task completion
-- 📱 **Responsive** - Works on various screen sizes
-- 🌐 **Static Hosting** - Deploy to GitHub Pages
-
-### Backend API
-- 🔐 **Authentication** - JWT + refresh tokens, OAuth ready
-- 📚 **Schedule Management** - Full CRUD for schedules and lessons
-- 🔄 **Real-time Sync** - WebSocket updates via Socket.IO
-- 📱 **Multi-device** - Device session tracking
-- ☁️ **Cloud Ready** - Docker + PostgreSQL + migrations
-- 🧪 **Well Tested** - Jest integration tests
-- 📖 **Documented** - Comprehensive API docs
-
-## 📚 Documentation
-
-### Desktop App
-- [Time Parsing Tests](test_parseTimeRange.js) - Unit tests for time utilities
-
-### Backend API
-- [API README](services/api/README.md) - Full API documentation
-- [Quick Start Guide](services/api/QUICK_START.md) - Get running in 5 minutes
-- [API Examples](services/api/API_EXAMPLES.md) - curl & JavaScript examples
-- [Contributing Guide](services/api/CONTRIBUTING.md) - Development guidelines
-
-## 🛠️ Development
-
-### Workspace Commands
-
-From the root directory:
+### Building for Production
 
 ```bash
-# Desktop app
-npm start              # Launch Electron app
-npm test               # Run time parsing tests
-
-# Backend API
-npm run api:dev        # Start API dev server
-npm run api:build      # Build API TypeScript
-npm run api:start      # Run API in production
-npm run api:test       # Run API tests
-npm run api:migrate    # Apply database migrations
+# Build React app and package Electron
+npm run build:electron
 ```
 
-### Tech Stack
+The packaged application will be in the `dist/` directory.
 
-**Desktop App:**
-- Electron 29
-- Vanilla JavaScript
-- HTML5/CSS3 (Glassmorphism)
+## Architecture
 
-**Backend API:**
-- Node.js 18+ with TypeScript
-- Express.js
-- PostgreSQL 16+ with Prisma ORM
-- Socket.IO for WebSockets
-- JWT authentication with bcrypt
-- Jest + Supertest for testing
+### Electron Main Process (`main.js`)
 
-## 🔧 Configuration
+- Creates the BrowserWindow
+- Loads the React app (dev server in development, built files in production)
+- Handles IPC communication via channels: `auth`, `schedule`, `cache`, `preferences`, `system`
+- Manages secure credential storage with keytar
+- Implements filesystem-backed offline cache
+- Sets up deep-link handling (`timetable://`)
+- Configures auto-updater
 
-### Desktop App
-Edit `data.js` to customize your schedule.
+### Preload Script (`preload.js`)
 
-### Backend API
-Copy `services/api/.env.example` to `services/api/.env` and configure:
-- `DATABASE_URL` - PostgreSQL connection string
-- `JWT_SECRET` - Secret for access tokens
-- `REFRESH_TOKEN_SECRET` - Secret for refresh tokens
-- `CORS_ORIGIN` - Allowed origins for CORS
+Hardened bridge between main and renderer processes:
+- Only exposes whitelisted IPC channels
+- Uses `contextIsolation` for security
+- Provides safe SDK interface via `window.electronAPI`
 
-## 🧪 Testing
+### SDK Layer (`packages/sdk`)
 
-### Desktop App Tests
+Abstraction layer for platform-specific functionality:
+- **TimetableSDK**: High-level API for authentication, schedule, cache, preferences
+- **ElectronAdapter**: Electron-specific implementation
+- **WebAdapter**: Browser fallback (uses localStorage, fetch API)
+
+### React App (`apps/web`)
+
+Modern React application with:
+- **AuthScreen**: Login interface
+- **TimetableApp**: Main schedule view with day selector, progress tracking, card flips
+- Theme and sound preferences
+- Offline/online status indicator
+- Real-time schedule updates
+
+## Security Features
+
+1. **Context Isolation**: Renderer process isolated from Node.js APIs
+2. **Sandbox**: Renderer runs in Chromium sandbox
+3. **No Remote Module**: Remote module disabled
+4. **Whitelisted IPC**: Only approved channels allowed
+5. **Keytar Integration**: OS-level credential encryption (Keychain on macOS, Credential Vault on Windows, libsecret on Linux)
+
+## Offline Support
+
+The app caches schedule data in the user's app data directory:
+- **Windows**: `%APPDATA%/jee-timetable/cache/`
+- **macOS**: `~/Library/Application Support/jee-timetable/cache/`
+- **Linux**: `~/.config/jee-timetable/cache/`
+
+When offline, the app automatically uses cached data and displays an offline indicator.
+
+## Deep Links
+
+The app registers the `timetable://` protocol:
+```
+timetable://open/schedule
+timetable://open/preferences
+```
+
+## Auto-Updates
+
+In production builds, the app checks for updates:
+- On startup
+- Every hour
+- Notifies user when update is available
+- Downloads and installs in background
+
+## Testing
+
 ```bash
+# Run unit tests for time parsing
 npm test
 ```
 
-### API Tests
-```bash
-npm run api:test
-```
+## Legacy Files
 
-## 🚢 Deployment
+The following files are kept for backward compatibility and will be retired in future versions:
+- `index.html` - Old static HTML (replaced by React app)
+- `renderer.js` - Old vanilla JS renderer (replaced by React components)
+- `style.css` - Old styles (migrated to React app)
 
-### Desktop App
-Package for distribution:
-```bash
-npm install electron-packager
-npx electron-packager . JEE-Timetable --platform=win32,darwin,linux --arch=x64
-```
+## Environment Variables
 
-Or deploy to GitHub Pages for web access.
+- `NODE_ENV`: Set to `development` to load dev server
+- `VITE_DEV_SERVER_URL`: Custom dev server URL (default: `http://localhost:3000`)
 
-### Backend API
+## Contributing
 
-**Using Docker:**
-```bash
-cd services/api
-docker build -t jee-timetable-api .
-docker run -p 3001:3001 --env-file .env jee-timetable-api
-```
+When making changes:
+1. Follow existing code patterns
+2. Test both development and production builds
+3. Ensure offline mode works
+4. Verify deep links on target platform
+5. Test auto-update flow
 
-**Using Cloud Platforms:**
-- Deploy PostgreSQL (AWS RDS, Heroku Postgres, etc.)
-- Deploy API (Heroku, Railway, Render, AWS ECS, etc.)
-- Set environment variables
-- Run migrations: `npm run migrate:prod`
+## License
 
-See [services/api/README.md#production-deployment](services/api/README.md#production-deployment) for details.
-
-## 📊 Database Schema
-
-The API uses PostgreSQL with these main tables:
-- **Users** - User accounts with email/password
-- **Schedules** - User-owned study schedules
-- **Lessons** - Individual schedule items (day, time, subject)
-- **RefreshTokens** - JWT refresh token management
-- **OAuthAccounts** - OAuth provider integrations
-- **DeviceSessions** - Multi-device session tracking
-- **SyncMetadata** - Schedule version tracking
-
-## 🔌 API Endpoints
-
-**Authentication:**
-- `POST /v1/auth/register` - Create account
-- `POST /v1/auth/login` - Login
-- `POST /v1/auth/refresh` - Refresh access token
-- `POST /v1/auth/logout` - Logout
-
-**Schedules:**
-- `GET /v1/schedule` - List schedules
-- `GET /v1/schedule/:id` - Get schedule with lessons
-- `POST /v1/schedule` - Create schedule
-- `PATCH /v1/schedule/:id` - Update schedule
-- `DELETE /v1/schedule/:id` - Delete schedule
-- `GET /v1/schedule/:id/sync?updated_since=<ISO_DATE>` - Incremental sync
-
-**Lessons:**
-- `GET /v1/lessons?scheduleId=&dayOfWeek=` - List lessons
-- `GET /v1/lessons/:id` - Get lesson
-- `POST /v1/lessons` - Create lesson
-- `PATCH /v1/lessons/:id` - Update lesson
-- `DELETE /v1/lessons/:id` - Delete lesson
-
-**Health:**
-- `GET /health` - Health check
-
-See [services/api/API_EXAMPLES.md](services/api/API_EXAMPLES.md) for usage examples.
-
-## 🔄 Real-time Updates
-
-The API supports WebSocket connections for live schedule updates:
-
-```javascript
-import io from 'socket.io-client';
-
-const socket = io('http://localhost:3001', {
-  auth: { token: 'YOUR_ACCESS_TOKEN' }
-});
-
-socket.emit('join:schedule', scheduleId);
-
-socket.on('schedule:updated', (data) => {
-  console.log('Schedule updated:', data.schedule);
-});
-```
-
-Events: `schedule:updated`, `lesson:created`, `lesson:updated`, `lesson:deleted`
-
-## 🤝 Contributing
-
-We welcome contributions! Please see [services/api/CONTRIBUTING.md](services/api/CONTRIBUTING.md) for guidelines.
-
-### Development Workflow
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Write/update tests
-5. Submit a pull request
-
-## 📝 License
-
-MIT
-
-## 🙏 Acknowledgments
-
-- Built for JEE aspirants to organize their study schedule
-- Uses emoji icons for visual subject identification
-- Inspired by modern productivity tools
-
-## 📧 Support
-
-For issues, questions, or feature requests:
-- Open an issue on GitHub
-- Check the documentation in `services/api/README.md`
-- Review API examples in `services/api/API_EXAMPLES.md`
-
-## 🎓 Demo Credentials
-
-The seeded database includes a demo account:
-- **Email:** demo@example.com
-- **Password:** demo123
-
-Use these to test the API without creating a new account.
+Proprietary - All rights reserved

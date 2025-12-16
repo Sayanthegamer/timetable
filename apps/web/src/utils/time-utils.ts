@@ -1,31 +1,23 @@
-// Time parsing utilities for timetable application
-// Exported functions: parseTimeRange, parseTimeString
-// NOTE: This logic is now centralized in @jee-timetable/timetable-sdk. 
-// Changes should be made there and mirrored here for the legacy renderer.
-
-function parseTimeString(timeStr, baseDate) {
-  // Accepts "h:mm AM/PM" or "h:mmAM/PM"
+export function parseTimeString(timeStr: string, baseDate: Date): Date | null {
   const match = timeStr.match(/(\d{1,2}):(\d{2})\s*([APM]{2})/i);
   if (!match) return null;
   let [, h, m, period] = match;
-  h = Number(h);
-  m = Number(m);
-  if (period.toUpperCase() === 'PM' && h !== 12) h += 12;
-  if (period.toUpperCase() === 'AM' && h === 12) h = 0;
+  let hour = Number(h);
+  const minute = Number(m);
+  if (period.toUpperCase() === 'PM' && hour !== 12) hour += 12;
+  if (period.toUpperCase() === 'AM' && hour === 12) hour = 0;
   const date = new Date(baseDate);
-  date.setHours(h, m, 0, 0);
+  date.setHours(hour, minute, 0, 0);
   return date;
 }
 
-function parseTimeRange(timeStr, baseDate) {
+export function parseTimeRange(timeStr: string, baseDate: Date): [Date | null, Date | null] {
   if (timeStr.includes('onwards')) return [null, null];
 
-  // Try to match both times, allowing the first to be missing AM/PM
   const rangeMatch = timeStr.match(/(\d{1,2}:\d{2})(?:\s*([AP]M))?\s*[–—-]\s*(\d{1,2}:\d{2})\s*([AP]M)/i);
   if (rangeMatch) {
     let [, startTime, startPeriod, endTime, endPeriod] = rangeMatch;
 
-    // If startPeriod is missing, infer it
     if (!startPeriod) {
       const [startHour] = startTime.split(':').map(Number);
       const [endHour] = endTime.split(':').map(Number);
@@ -44,7 +36,7 @@ function parseTimeRange(timeStr, baseDate) {
         if (startHour === 12) {
           startPeriod = 'AM';
         } else if (startHour > endHour) {
-          startPeriod = 'PM'; // overnight case like 11:30 - 1:30 AM
+          startPeriod = 'PM';
         } else {
           startPeriod = 'AM';
         }
@@ -58,22 +50,34 @@ function parseTimeRange(timeStr, baseDate) {
     return [start, end];
   }
 
-  // Single time (point event)
   const singleMatch = timeStr.match(/(\d{1,2}:\d{2})\s*([APM]{2})/i);
   if (singleMatch) {
     const timePoint = parseTimeString(singleMatch[1] + ' ' + singleMatch[2], baseDate);
-    return [timePoint, new Date(timePoint.getTime() + 30 * 60000)];
+    if (timePoint) {
+      return [timePoint, new Date(timePoint.getTime() + 30 * 60000)];
+    }
   }
   return [null, null];
 }
 
-// For Node.js (CommonJS)
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { parseTimeRange, parseTimeString };
+export function isTaskLive(timeStr: string, now: Date): boolean {
+  const [start, end] = parseTimeRange(timeStr, now);
+  if (!start || !end) return false;
+  return now >= start && now < end;
 }
 
-// For Browser (global window)
-if (typeof window !== 'undefined') {
-  window.parseTimeRange = parseTimeRange;
-  window.parseTimeString = parseTimeString;
+export function isTaskCompleted(timeStr: string, now: Date): boolean {
+  const [, end] = parseTimeRange(timeStr, now);
+  if (!end) return false;
+  return now >= end;
+}
+
+export function getTaskProgress(timeStr: string, now: Date): number {
+  const [start, end] = parseTimeRange(timeStr, now);
+  if (!start || !end) return 0;
+  if (now < start) return 0;
+  if (now >= end) return 100;
+  const total = end.getTime() - start.getTime();
+  const elapsed = now.getTime() - start.getTime();
+  return Math.round((elapsed / total) * 100);
 }

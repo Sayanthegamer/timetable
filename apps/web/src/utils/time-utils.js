@@ -1,7 +1,5 @@
 // Time parsing utilities for timetable application
 // Exported functions: parseTimeRange, parseTimeString
-// NOTE: This logic is now centralized in @jee-timetable/timetable-sdk. 
-// Changes should be made there and mirrored here for the legacy renderer.
 
 function parseTimeString(timeStr, baseDate) {
   // Accepts "h:mm AM/PM" or "h:mmAM/PM"
@@ -66,6 +64,9 @@ function parseTimeRange(timeStr, baseDate) {
   }
   return [null, null];
 }
+
+// ES module exports
+export { parseTimeRange, parseTimeString };
 
 // For Node.js (CommonJS)
 if (typeof module !== 'undefined' && module.exports) {

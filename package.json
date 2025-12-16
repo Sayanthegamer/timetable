@@ -1,21 +1,57 @@
 {
-  "name": "jee-timetable",
+  "name": "jee-timetable-monorepo",
   "version": "1.0.0",
   "private": true,
   "workspaces": [
-    "services/api"
+    "packages/*",
+    "apps/*"
   ],
   "scripts": {
-    "start": "electron .",
-    "test": "node test_parseTimeRange.js",
-    "api:dev": "npm run dev --workspace=services/api",
-    "api:build": "npm run build --workspace=services/api",
-    "api:start": "npm run start --workspace=services/api",
-    "api:test": "npm run test --workspace=services/api",
-    "api:migrate": "npm run migrate --workspace=services/api"
+    "start": "NODE_ENV=development electron .",
+    "dev": "concurrently \"npm run dev:web\" \"npm run dev:electron\"",
+    "dev:web": "cd apps/web && npm run dev",
+    "dev:electron": "wait-on http://localhost:3000 && NODE_ENV=development electron .",
+    "build": "cd apps/web && npm run build",
+    "build:electron": "npm run build && electron-builder",
+    "test": "node test_parseTimeRange.js"
   },
+  "main": "main.js",
   "devDependencies": {
+    "concurrently": "^8.2.2",
     "electron": "^29.3.0",
-    "electron-packager": "^17.1.2"
+    "electron-builder": "^24.13.3",
+    "electron-packager": "^17.1.2",
+    "wait-on": "^7.2.0"
+  },
+  "dependencies": {
+    "electron-updater": "^6.1.8",
+    "keytar": "^7.9.0"
+  },
+  "build": {
+    "appId": "com.timetable.jee",
+    "productName": "JEE Timetable",
+    "files": [
+      "main.js",
+      "preload.js",
+      "data.js",
+      "icon.ico",
+      "apps/web/dist/**/*"
+    ],
+    "directories": {
+      "buildResources": "assets",
+      "output": "dist"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "icon.ico"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "icon.ico"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "icon.ico"
+    }
   }
 }
