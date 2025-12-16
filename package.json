@@ -1,11 +1,19 @@
 {
-  "name": "jee-timetable",
+  "name": "jee-timetable-monorepo",
   "version": "1.0.0",
-  "main": "main.js",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
   "scripts": {
     "start": "electron .",
-    "test": "node test_parseTimeRange.js"
+    "test": "node test_parseTimeRange.js",
+    "dev": "npm run dev --workspace apps/web",
+    "build": "npm run build --workspace apps/web",
+    "preview": "npm run preview --workspace apps/web"
   },
+  "main": "main.js",
   "devDependencies": {
     "electron": "^29.3.0",
     "electron-packager": "^17.1.2"
