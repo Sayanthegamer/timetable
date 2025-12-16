@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import rateLimit from 'express-rate-limit';
 import {
   getLessons,
   getLesson,
@@ -11,9 +12,6 @@ import { validate } from '../middleware/validation';
 import { createLessonSchema, updateLessonSchema } from '../schemas/schedule';
 
 const router = Router();
-
-router.use(authenticate);
-
 router.get('/', getLessons);
 router.get('/:id', getLesson);
 router.post('/', validate(createLessonSchema), createLesson);
