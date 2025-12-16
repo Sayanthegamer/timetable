@@ -1,0 +1,122 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String          @id @default(uuid())
+  email         String          @unique
+  passwordHash  String          @map("password_hash")
+  name          String?
+  createdAt     DateTime        @default(now()) @map("created_at")
+  updatedAt     DateTime        @updatedAt @map("updated_at")
+  
+  schedules     Schedule[]
+  deviceSessions DeviceSession[]
+  refreshTokens RefreshToken[]
+  oauthAccounts  OAuthAccount[]
+  
+  @@map("users")
+}
+
+model RefreshToken {
+  id          String   @id @default(uuid())
+  token       String   @unique
+  userId      String   @map("user_id")
+  expiresAt   DateTime @map("expires_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+  revoked     Boolean  @default(false)
+  
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@map("refresh_tokens")
+}
+
+model OAuthAccount {
+  id            String   @id @default(uuid())
+  userId        String   @map("user_id")
+  provider      String
+  providerAccountId String @map("provider_account_id")
+  accessToken   String?  @map("access_token")
+  refreshToken  String?  @map("refresh_token")
+  expiresAt     DateTime? @map("expires_at")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+  
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+  @@map("oauth_accounts")
+}
+
+model Schedule {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  name        String   @default("My Schedule")
+  timezone    String   @default("Asia/Kolkata")
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lessons     Lesson[]
+  syncMetadata SyncMetadata?
+  
+  @@index([userId])
+  @@map("schedules")
+}
+
+model Lesson {
+  id          String   @id @default(uuid())
+  scheduleId  String   @map("schedule_id")
+  dayOfWeek   String   @map("day_of_week")
+  startTime   String   @map("start_time")
+  endTime     String   @map("end_time")
+  subject     String
+  details     String?
+  type        String
+  order       Int      @default(0)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  schedule    Schedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+  
+  @@index([scheduleId])
+  @@index([dayOfWeek])
+  @@map("lessons")
+}
+
+model DeviceSession {
+  id            String   @id @default(uuid())
+  userId        String   @map("user_id")
+  deviceId      String   @map("device_id")
+  deviceName    String?  @map("device_name")
+  userAgent     String?  @map("user_agent")
+  ipAddress     String?  @map("ip_address")
+  lastActiveAt  DateTime @default(now()) @map("last_active_at")
+  createdAt     DateTime @default(now()) @map("created_at")
+  
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, deviceId])
+  @@index([userId])
+  @@map("device_sessions")
+}
+
+model SyncMetadata {
+  id            String   @id @default(uuid())
+  scheduleId    String   @unique @map("schedule_id")
+  lastSyncedAt  DateTime @default(now()) @map("last_synced_at")
+  syncVersion   Int      @default(1) @map("sync_version")
+  checksum      String?
+  
+  schedule      Schedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+  
+  @@map("sync_metadata")
+}
