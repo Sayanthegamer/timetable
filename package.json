@@ -1,10 +1,16 @@
 {
   "name": "jee-timetable",
   "version": "1.0.0",
+  "workspaces": [
+    "packages/*"
+  ],
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "test": "node test_parseTimeRange.js"
+    "test": "node test_parseTimeRange.js && npm test --workspace=packages/timetable-sdk"
+  },
+  "dependencies": {
+    "@jee-timetable/timetable-sdk": "*"
   },
   "devDependencies": {
     "electron": "^29.3.0",
